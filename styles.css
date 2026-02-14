@@ -1,0 +1,414 @@
+﻿:root {
+  --primary: #0f2a43;
+  --primary-soft: #1a3c5f;
+  --accent: #2f7db8;
+  --bg: #eef2f6;
+  --card: #ffffff;
+  --text: #122131;
+  --muted: #60758a;
+  --border: #d5dde5;
+  --ok: #12744a;
+  --warn: #a15a00;
+  --danger: #a72626;
+  --shadow: 0 10px 30px rgba(9, 32, 53, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Cairo', sans-serif;
+  background: linear-gradient(155deg, #edf2f8 0%, #e4eaf2 45%, #f5f7fb 100%);
+  color: var(--text);
+}
+
+.app-shell {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  min-height: 100vh;
+}
+
+.sidebar {
+  background: linear-gradient(180deg, var(--primary) 0%, #0c2238 100%);
+  color: #fff;
+  padding: 1.2rem 1rem;
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+}
+
+.brand img {
+  width: 54px;
+  height: 54px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+}
+
+.brand h1 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.brand p {
+  margin: 0;
+  color: #c8d7e8;
+  font-size: 0.85rem;
+}
+
+.menu {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.menu-item {
+  border: 0;
+  background: rgba(255, 255, 255, 0.08);
+  color: #f4f8fc;
+  text-align: right;
+  padding: 0.75rem 0.9rem;
+  border-radius: 10px;
+  font: inherit;
+  cursor: pointer;
+  transition: 0.25s ease;
+}
+
+.menu-item:hover,
+.menu-item.active {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateX(-2px);
+}
+
+.content {
+  padding: 1.3rem;
+}
+
+.topbar {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  padding: 0.9rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.topbar h2 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.topbar p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.page {
+  display: none;
+}
+
+.page.active {
+  display: block;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.card h3 {
+  margin: 0 0 0.8rem;
+  font-size: 1.02rem;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.8rem;
+}
+
+.stat-card h3 {
+  color: var(--muted);
+  margin-bottom: 0.45rem;
+  font-size: 0.92rem;
+}
+
+.stat-card p {
+  margin: 0;
+  font-size: 1.35rem;
+  color: var(--primary);
+  font-weight: 800;
+}
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8rem;
+}
+
+.chart-card {
+  position: relative;
+  min-height: 320px;
+}
+
+.chart-card canvas {
+  display: block;
+  width: 100% !important;
+  height: 260px !important;
+}
+
+.chart-card.full-width {
+  grid-column: 1 / -1;
+}
+
+.chart-card.full-width canvas {
+  height: 300px !important;
+}
+
+.form-grid,
+.filters-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.75rem;
+}
+
+.form-grid.compact {
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.9rem;
+}
+
+input,
+select,
+button {
+  font: inherit;
+}
+
+input,
+select {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.55rem 0.65rem;
+  background: #fff;
+}
+
+input:focus,
+select:focus {
+  outline: 2px solid rgba(47, 125, 184, 0.22);
+  border-color: var(--accent);
+}
+
+.form-actions {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+
+.backup-actions {
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.btn {
+  border: 0;
+  border-radius: 8px;
+  padding: 0.58rem 0.9rem;
+  cursor: pointer;
+}
+
+.btn.primary {
+  background: var(--accent);
+  color: #fff;
+}
+
+.btn.secondary {
+  background: #dde6f0;
+  color: var(--primary);
+}
+
+.btn:hover {
+  filter: brightness(0.95);
+}
+
+.message {
+  margin: 0.6rem 0 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.message.ok {
+  color: var(--ok);
+}
+
+.message.warn {
+  color: var(--warn);
+}
+
+.message.err {
+  color: var(--danger);
+}
+
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.7rem;
+  margin-bottom: 0.55rem;
+}
+
+.table-header input {
+  max-width: 330px;
+  width: 100%;
+}
+
+.table-wrap {
+  overflow: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 690px;
+}
+
+th,
+td {
+  border-bottom: 1px solid var(--border);
+  padding: 0.58rem;
+  text-align: right;
+  font-size: 0.9rem;
+}
+
+th {
+  background: #f4f7fb;
+  color: #29445f;
+}
+
+.two-col {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+
+.stock-list {
+  background: #f4f7fb;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.7rem;
+  margin-bottom: 0.7rem;
+}
+
+.stock-list p {
+  margin: 0.25rem 0;
+}
+
+.report-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.55rem;
+}
+
+.report-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.report-list p {
+  margin: 0.45rem 0;
+  font-size: 0.95rem;
+}
+
+.report-total {
+  margin: 0.8rem 0 0;
+  color: var(--primary);
+  font-weight: 700;
+}
+
+@media (max-width: 1050px) {
+  .app-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    border-left: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+  }
+
+  .menu {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .charts-grid,
+  .two-col {
+    grid-template-columns: 1fr;
+  }
+
+  .chart-card canvas {
+    height: 230px !important;
+  }
+
+  .chart-card.full-width canvas {
+    height: 250px !important;
+  }
+}
+
+@media print {
+  body {
+    background: #fff;
+  }
+
+  .sidebar,
+  .topbar,
+  .menu,
+  .report-actions,
+  .filters-grid,
+  #report-search,
+  .table-header {
+    display: none !important;
+  }
+
+  .content,
+  .card {
+    padding: 0;
+    box-shadow: none;
+    border: 0;
+  }
+
+  .page {
+    display: none !important;
+  }
+
+  #reports.page.active {
+    display: block !important;
+  }
+
+  .report-block {
+    display: none !important;
+  }
+
+  .report-block.print-target {
+    display: block !important;
+  }
+}
