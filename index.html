@@ -1,0 +1,378 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>نظام إدارة تغيير الزيوت - مصنع بن البهنساوي</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <img src="5.jpg" alt="شعار المصنع" />
+        <div>
+          <h1>بن البهنساوي</h1>
+          <p>إدارة زيوت المصنع</p>
+        </div>
+      </div>
+      <nav class="menu">
+        <button class="menu-item active" data-page="dashboard">لوحة التحكم</button>
+        <button class="menu-item" data-page="operations">تسجيل تغيير زيت</button>
+        <button class="menu-item" data-page="settings">الإعدادات والمخزون</button>
+        <button class="menu-item" data-page="reports">التقارير</button>
+      </nav>
+    </aside>
+
+    <main class="content">
+      <header class="topbar">
+        <h2 id="page-title">لوحة التحكم</h2>
+        <p id="today-date"></p>
+      </header>
+
+      <section id="dashboard" class="page active">
+        <div class="stats-grid">
+          <article class="card stat-card">
+            <h3>إجمالي عدد التغييرات</h3>
+            <p id="stat-total-ops">0</p>
+          </article>
+          <article class="card stat-card">
+            <h3>إجمالي الاستهلاك (كجم)</h3>
+            <p id="stat-total-consumption">0</p>
+          </article>
+          <article class="card stat-card">
+            <h3>إجمالي التكلفة</h3>
+            <p id="stat-total-cost">0 ج.م</p>
+          </article>
+          <article class="card stat-card">
+            <h3>المخزون المتبقي (كجم)</h3>
+            <p id="stat-stock-left">0</p>
+          </article>
+          <article class="card stat-card">
+            <h3>أكثر سيارة تغييرًا</h3>
+            <p id="stat-top-car">-</p>
+          </article>
+        </div>
+
+        <div class="charts-grid">
+          <article class="card chart-card">
+            <h3>الاستهلاك حسب النوع</h3>
+            <canvas id="chart-consumption"></canvas>
+          </article>
+          <article class="card chart-card">
+            <h3>التكلفة حسب الشهر</h3>
+            <canvas id="chart-monthly-cost"></canvas>
+          </article>
+          <article class="card chart-card full-width">
+            <h3>عدد التغييرات حسب التاريخ</h3>
+            <canvas id="chart-daily-ops"></canvas>
+          </article>
+        </div>
+      </section>
+
+      <section id="operations" class="page">
+        <article class="card">
+          <h3>إضافة عملية تغيير زيت</h3>
+          <form id="operation-form" class="form-grid">
+            <label>
+              رقم العربية
+              <input type="text" id="car-number" required />
+            </label>
+            <label>
+              اسم السواق
+              <input type="text" id="driver-name" required />
+            </label>
+            <label>
+              نوع الوقود
+              <select id="fuel-type" required>
+                <option value="">اختر</option>
+                <option value="diesel">سولار</option>
+                <option value="gasoline">بنزين</option>
+              </select>
+            </label>
+            <label>
+              نوع الزيت (تلقائي)
+              <input type="text" id="oil-type" readonly />
+            </label>
+            <label>
+              الكمية (كجم)
+              <input type="number" id="quantity-kg" min="0.1" step="0.1" required />
+            </label>
+            <label>
+              عداد الكيلومتر
+              <input type="number" id="odometer" min="0" required />
+            </label>
+            <label>
+              التاريخ
+              <input type="date" id="operation-date" required />
+            </label>
+            <label>
+              تكلفة الكيلو
+              <input type="text" id="cost-per-kg-view" readonly />
+            </label>
+            <label>
+              تكلفة العملية
+              <input type="text" id="total-cost-view" readonly />
+            </label>
+            <div class="form-actions">
+              <button type="submit" class="btn primary">حفظ العملية</button>
+            </div>
+          </form>
+          <p id="form-message" class="message"></p>
+        </article>
+
+        <article class="card">
+          <div class="table-header">
+            <h3>سجل التغييرات</h3>
+            <input type="text" id="ops-search" placeholder="بحث مباشر داخل الجدول..." />
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>رقم العربية</th>
+                  <th>السواق</th>
+                  <th>نوع الزيت</th>
+                  <th>الكمية</th>
+                  <th>العداد</th>
+                  <th>التكلفة</th>
+                  <th>التاريخ</th>
+                  <th>إجراء</th>
+                </tr>
+              </thead>
+              <tbody id="ops-table-body"></tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+
+      <section id="settings" class="page">
+        <div class="two-col">
+          <article class="card">
+            <h3>إعدادات الأسعار</h3>
+            <form id="settings-form" class="form-grid compact">
+              <label>
+                سعر جركن زيت السولار (20 كجم)
+                <input type="number" id="diesel-drum-price" min="0" step="0.01" required />
+              </label>
+              <label>
+                تكلفة الكيلو (سولار)
+                <input type="text" id="diesel-cost-per-kg" readonly />
+              </label>
+              <label>
+                سعر جركن زيت البنزين (4 كجم)
+                <input type="number" id="gasoline-drum-price" min="0" step="0.01" required />
+              </label>
+              <label>
+                تكلفة الكيلو (بنزين)
+                <input type="text" id="gasoline-cost-per-kg" readonly />
+              </label>
+              <div class="form-actions">
+                <button type="submit" class="btn primary">حفظ الأسعار</button>
+              </div>
+            </form>
+            <p id="settings-message" class="message"></p>
+          </article>
+
+          <article class="card">
+            <h3>إدارة المخزون</h3>
+            <div class="stock-list">
+              <p>مخزون زيت السولار: <strong id="stock-diesel-view">0</strong> كجم</p>
+              <p>مخزون زيت البنزين: <strong id="stock-gasoline-view">0</strong> كجم</p>
+            </div>
+            <form id="stock-form" class="form-grid compact">
+              <label>
+                إضافة كمية لسولار (كجم)
+                <input type="number" id="add-diesel-stock" min="0" step="0.1" value="0" />
+              </label>
+              <label>
+                إضافة كمية لبنزين (كجم)
+                <input type="number" id="add-gasoline-stock" min="0" step="0.1" value="0" />
+              </label>
+              <div class="form-actions">
+                <button type="submit" class="btn primary">إضافة للمخزون</button>
+              </div>
+            </form>
+            <p id="stock-message" class="message"></p>
+          </article>
+        </div>
+        <article class="card">
+          <h3>النسخ الاحتياطي والاستعادة</h3>
+          <div class="form-actions backup-actions">
+            <button type="button" id="export-backup" class="btn secondary">تصدير Backup</button>
+            <button type="button" id="restore-backup" class="btn secondary">استعادة Restore</button>
+            <button type="button" id="clear-all-data" class="btn danger">مسح كل البيانات</button>
+            <input type="file" id="restore-file" accept="application/json,.json" hidden />
+          </div>
+          <p id="backup-message" class="message"></p>
+        </article>
+      </section>
+
+      <section id="reports" class="page">
+        <article class="card">
+          <h3>فلاتر التقارير</h3>
+          <form id="report-filters" class="filters-grid">
+            <label>
+              من تاريخ
+              <input type="date" id="filter-from" />
+            </label>
+            <label>
+              إلى تاريخ
+              <input type="date" id="filter-to" />
+            </label>
+            <label>
+              نوع الزيت
+              <select id="filter-oil">
+                <option value="all">الكل</option>
+                <option value="diesel">سولار</option>
+                <option value="gasoline">بنزين</option>
+              </select>
+            </label>
+            <label>
+              رقم العربية
+              <input type="text" id="filter-car" placeholder="مثال: 1234" />
+            </label>
+            <label>
+              التكلفة (أكبر من)
+              <input type="number" id="filter-cost-min" min="0" step="0.01" />
+            </label>
+            <label>
+              التكلفة (أقل من)
+              <input type="number" id="filter-cost-max" min="0" step="0.01" />
+            </label>
+            <label>
+              أقل عدد تغييرات للسيارة
+              <input type="number" id="filter-change-count" min="1" step="1" />
+            </label>
+            <div class="form-actions">
+              <button type="button" id="apply-filters" class="btn primary">تطبيق الفلاتر</button>
+              <button type="button" id="reset-filters" class="btn secondary">إعادة ضبط</button>
+            </div>
+          </form>
+        </article>
+
+        <article class="card report-block" id="changes-report">
+          <div class="report-head">
+            <h3>تقرير التغييرات</h3>
+            <div class="report-actions">
+              <button class="btn secondary" data-pdf="changes-report" data-title="تقرير التغييرات">تحميل PDF</button>
+              <button class="btn secondary" data-print="changes-report">طباعة</button>
+            </div>
+          </div>
+          <div class="table-header">
+            <input type="text" id="report-search" placeholder="بحث مباشر داخل تقرير التغييرات..." />
+          </div>
+          <div class="table-wrap report-content">
+            <table>
+              <thead>
+                <tr>
+                  <th>رقم العربية</th>
+                  <th>السواق</th>
+                  <th>نوع الزيت</th>
+                  <th>الكمية</th>
+                  <th>العداد</th>
+                  <th>التكلفة</th>
+                  <th>التاريخ</th>
+                </tr>
+              </thead>
+              <tbody id="report-ops-body"></tbody>
+            </table>
+          </div>
+          <p class="report-total">إجمالي التكلفة: <strong id="report-ops-total">0 ج.م</strong></p>
+        </article>
+
+        <article class="card report-block" id="consumption-report">
+          <div class="report-head">
+            <h3>تقرير الاستهلاك</h3>
+            <div class="report-actions">
+              <button class="btn secondary" data-pdf="consumption-report" data-title="تقرير الاستهلاك">تحميل PDF</button>
+              <button class="btn secondary" data-print="consumption-report">طباعة</button>
+            </div>
+          </div>
+          <div class="table-wrap report-content" id="consumption-report-content">
+            <table class="summary-table">
+              <thead>
+                <tr>
+                  <th>البند</th>
+                  <th>القيمة</th>
+                  <th>الوحدة</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>إجمالي استهلاك السولار</td>
+                  <td id="cons-diesel">0</td>
+                  <td>كجم</td>
+                </tr>
+                <tr>
+                  <td>إجمالي استهلاك البنزين</td>
+                  <td id="cons-gasoline">0</td>
+                  <td>كجم</td>
+                </tr>
+                <tr>
+                  <td>المتبقي سولار</td>
+                  <td id="left-diesel">0</td>
+                  <td>كجم</td>
+                </tr>
+                <tr>
+                  <td>المتبقي بنزين</td>
+                  <td id="left-gasoline">0</td>
+                  <td>كجم</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="report-total">إجمالي التكلفة: <strong id="report-cons-total">0 ج.م</strong></p>
+        </article>
+
+        <article class="card report-block" id="cost-report">
+          <div class="report-head">
+            <h3>تقرير التكلفة</h3>
+            <div class="report-actions">
+              <button class="btn secondary" data-pdf="cost-report" data-title="تقرير التكلفة">تحميل PDF</button>
+              <button class="btn secondary" data-print="cost-report">طباعة</button>
+            </div>
+          </div>
+          <div class="table-wrap report-content" id="cost-report-content">
+            <table class="summary-table">
+              <thead>
+                <tr>
+                  <th>البند</th>
+                  <th>القيمة</th>
+                  <th>العملة</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>إجمالي تكلفة زيت السولار</td>
+                  <td id="cost-diesel">0</td>
+                  <td>ج.م</td>
+                </tr>
+                <tr>
+                  <td>إجمالي تكلفة زيت البنزين</td>
+                  <td id="cost-gasoline">0</td>
+                  <td>ج.م</td>
+                </tr>
+                <tr>
+                  <td>إجمالي التكلفة الكلية</td>
+                  <td id="cost-total">0</td>
+                  <td>ج.م</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="report-total">إجمالي التكلفة: <strong id="report-cost-total">0 ج.م</strong></p>
+        </article>
+      </section>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
